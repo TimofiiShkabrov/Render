@@ -14,83 +14,102 @@ struct MainView: View {
     var body: some View {
         ScrollView {
             VStack {
-                VStack {
-                    HStack(spacing: 16) {
-                        TextField("Введите Emoji или текст", text: $render.text)
-                            .padding(4)
-                            .background(Color(.secondarySystemBackground))
-                            .cornerRadius(8)
-                        
-                        Button(action: {
-                            render.hideKeyboard()
-                            render.convertTextToPNG()
-                        }) {
-                            HStack {
-                                Text("Рендер")
-                                Image("Logo")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 32, height: 32)
-                            }
-                        }
-                        .disabled(render.text .isEmpty)
-                    }
-                    .padding(.bottom, 8)
+                HStack(spacing: 16) {
+                    TextField("Введите Emoji или текст", text: $render.text)
+                        .padding(4)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(8)
                     
-                    Text("Введите Emoji или текст к поле выше и нажмите кнопку Рендер")
-                        .font(.subheadline)
-                        .foregroundStyle(.gray)
+                    Button(action: {
+                        render.hideKeyboard()
+                        render.showSaveAlert = false
+                        render.convertTextToPNG()
+                    }) {
+                        HStack {
+                            Text("Рендер")
+                            Image("Logo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 32, height: 32)
+                        }
+                    }
+                    .disabled(render.text .isEmpty)
                 }
                 .padding(.top, 16)
                 .padding(.bottom, 32)
                 
-                if let image = render.image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .background(
-                            Image("BackgroundPNG")
+                HStack {
+                    if render.showSaveAlert {
+                        VStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .symbolEffect(.wiggle.backward.byLayer)
+                                .imageScale(.large)
+                            Text("Сохронено!")
+                                .foregroundStyle(.black)
+                        }
+                    } else {
+                        if let image = render.image {
+                            Image(uiImage: image)
                                 .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        )
-                        .opacity(0.9)
-                        .cornerRadius(16)
-                } else {
-                    Image("Logo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .background(
-                            Image("BackgroundPNG")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        )
-                        .opacity(0.9)
-                        .cornerRadius(16)
+                                .aspectRatio(contentMode: .fit)
+                        } else {
+                            VStack {
+                                Image(systemName: "pencil.line")
+                                    .foregroundColor(.blue)
+                                    .symbolEffect(.wiggle.backward.byLayer)
+                                    .imageScale(.large)
+                                Text("Введите Emoji или текст к поле выше и нажмите кнопку Рендер")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.black)
+                            }
+                        }
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width - 16.0, height: UIScreen.main.bounds.width - 16.0)
+                .background(Image("BackgroundPNG")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .opacity(0.9)
+                    .cornerRadius(16))
+                .padding(.bottom, 16)
+                
+                ColorPicker("Цвет текста:", selection: $render.textColor)
+                HStack {
+                    Text("Размер текста:")
+                    Slider(value: $render.fontSize, in: 1...CGFloat(Int(UIScreen.main.bounds.width)))
                 }
                 
                 HStack {
+                    if let fileURL = render.createPNGFile() {
+                        ShareLink(item: fileURL, preview: SharePreview("Rendered Image", image: Image(uiImage: render.image!))) {
+                            HStack {
+                                Text("Поделиться")
+                                Image(systemName: "square.and.arrow.up.fill")
+                                    .imageScale(.medium)
+                                    .symbolEffect(.bounce.down.byLayer)
+                            }
+                        }
+                    }
+                    
+                    Spacer()
+                    
                     Button (action: {
                         render.saveImageToGallery()
                     }) {
                         HStack {
                             Text("Сохранить")
                             Image(systemName: "square.and.arrow.down.fill")
-                                .imageScale(.medium)
-                                .symbolEffect(.bounce.down.byLayer)
+                                .imageScale(.large)
+                                .symbolEffect(.breathe.plain.byLayer)
                         }
                     }
-                    
-                    
-                    
                 }
                 .disabled(render.image == nil)
                 .padding()
                 Spacer()
             }
-            .padding(.horizontal, 24)
-        }
-        .alert(isPresented: $render.showSaveAlert) {
-            Alert(title: Text("Результат сохранения"), message: Text(render.saveResultMessage), dismissButton: .default(Text("OK")))
+            .padding(.horizontal, 16)
         }
         .onTapGesture {
             render.hideKeyboard()

@@ -8,6 +8,7 @@
 import Foundation
 import Observation
 import PhotosUI
+import SwiftUI
 
 @Observable
 class Render {
@@ -16,6 +17,8 @@ class Render {
     var image: UIImage?
     var showSaveAlert = false
     var saveResultMessage = ""
+    var fontSize: CGFloat = 200
+    var textColor = Color(.sRGB, red: 0.98, green: 0.9, blue: 0.2)
     
     func convertTextToPNG() {
         let size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
@@ -30,8 +33,8 @@ class Render {
         
         // Установка цвета текста
         let attributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.systemFont(ofSize: 180),
-            .foregroundColor: UIColor.red
+            .font: UIFont.systemFont(ofSize: fontSize),
+            .foregroundColor: UIColor(textColor)
         ]
         
         // Рассчитываем размер текста
@@ -78,6 +81,23 @@ class Render {
             }
         }
     }
+    
+    func createPNGFile() -> URL? {
+        guard let image = image, let pngData = image.pngData() else { return nil }
+        
+        let fileName = "RenderedImage.png"
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(fileName)
+        
+        do {
+            try pngData.write(to: fileURL)
+            return fileURL
+        } catch {
+            print("Error saving PNG file: \(error)")
+            return nil
+        }
+    }
+
     
     func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
