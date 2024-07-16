@@ -10,15 +10,26 @@ import SwiftUI
 struct MainView: View {
     
     @State private var render = Render()
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ScrollView {
             VStack {
-                HStack(spacing: 16) {
+                VStack {
                     TextField("Введите Emoji или текст", text: $render.text)
-                        .padding(4)
+                        .padding(8)
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(8)
+                        .padding(.bottom, 16)
+                    VStack {
+                        ColorPicker("Цвет текста:", selection: $render.textColor)
+                        HStack {
+                            Text("Размер:")
+                            Slider(value: $render.fontSize, in: 1...CGFloat(Int(UIScreen.main.bounds.width * 0.8)))
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 8)
                     
                     Button(action: {
                         render.hideKeyboard()
@@ -27,22 +38,27 @@ struct MainView: View {
                     }) {
                         HStack {
                             Text("Рендер")
-                            Image("Logo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 32, height: 32)
+                                .foregroundStyle(.white)
+                            Image(systemName: "sparkles")
+                                .imageScale(.large)
                         }
+                        .foregroundStyle(.white)
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .cornerRadius(8)
                     }
                     .disabled(render.text .isEmpty)
                 }
                 .padding(.top, 16)
-                .padding(.bottom, 32)
-                
+                .padding(.bottom, 16)
+
                 HStack {
                     if render.showSaveAlert {
                         VStack {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                                .foregroundStyle(.green)
                                 .symbolEffect(.wiggle.backward.byLayer)
                                 .imageScale(.large)
                             Text("Сохронено!")
@@ -56,10 +72,11 @@ struct MainView: View {
                         } else {
                             VStack {
                                 Image(systemName: "pencil.line")
-                                    .foregroundColor(.blue)
+                                    .foregroundStyle(.blue)
                                     .symbolEffect(.wiggle.backward.byLayer)
                                     .imageScale(.large)
-                                Text("Введите Emoji или текст к поле выше и нажмите кнопку Рендер")
+                                Text("Введите Emoji или текст к поле выше\n и нажмите кнопку Рендер")
+                                    .multilineTextAlignment(.center)
                                     .font(.subheadline)
                                     .foregroundStyle(.black)
                             }
@@ -67,18 +84,12 @@ struct MainView: View {
                     }
                 }
                 .frame(width: UIScreen.main.bounds.width - 16.0, height: UIScreen.main.bounds.width - 16.0)
-                .background(Image("BackgroundPNG")
+                .background(Image("PNGBackground")
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .aspectRatio(contentMode: .fit)
                     .opacity(0.9)
                     .cornerRadius(16))
                 .padding(.bottom, 16)
-                
-                ColorPicker("Цвет текста:", selection: $render.textColor)
-                HStack {
-                    Text("Размер текста:")
-                    Slider(value: $render.fontSize, in: 1...CGFloat(Int(UIScreen.main.bounds.width)))
-                }
                 
                 HStack {
                     if let fileURL = render.createPNGFile() {
@@ -86,10 +97,18 @@ struct MainView: View {
                             HStack {
                                 Text("Поделиться")
                                 Image(systemName: "square.and.arrow.up.fill")
-                                    .imageScale(.medium)
-                                    .symbolEffect(.bounce.down.byLayer)
+                                    .imageScale(.large)
+                                    .symbolEffect(.breathe.plain.byLayer)
                             }
                         }
+                    } else {
+                        HStack {
+                            Text("Поделиться")
+                            Image(systemName: "square.and.arrow.up.fill")
+                                .imageScale(.large)
+                                .symbolEffect(.breathe.plain.byLayer)
+                        }
+                        .foregroundStyle(colorScheme == .dark ? Color(#colorLiteral(red: 0.2745094299, green: 0.274510026, blue: 0.2873998582, alpha: 1)) : Color(#colorLiteral(red: 0.7725487947, green: 0.772549212, blue: 0.7811570764, alpha: 1)))
                     }
                     
                     Spacer()

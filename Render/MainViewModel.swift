@@ -18,7 +18,7 @@ class Render {
     var showSaveAlert = false
     var saveResultMessage = ""
     var fontSize: CGFloat = 200
-    var textColor = Color(.sRGB, red: 0.98, green: 0.9, blue: 0.2)
+    var textColor = Color(.sRGB, red: 0.1, green: 0.1, blue: 0.1)
     
     func convertTextToPNG() {
         let size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
@@ -32,13 +32,19 @@ class Render {
         context.fill(CGRect(origin: .zero, size: size))
         
         // Установка цвета текста
-        let attributes: [NSAttributedString.Key: Any] = [
+        var attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: fontSize),
             .foregroundColor: UIColor(textColor)
         ]
         
-        // Рассчитываем размер текста
-        let textSize = (text as NSString).size(withAttributes: attributes)
+        var textSize = (text as NSString).size(withAttributes: attributes)
+        
+        // Уменьшение размера текста, если он не помещается
+        while textSize.width > size.width - 20 {
+            fontSize -= 1
+            attributes[.font] = UIFont.systemFont(ofSize: fontSize)
+            textSize = (text as NSString).size(withAttributes: attributes)
+        }
         
         // Центрируем текст
         let textRect = CGRect(
@@ -97,7 +103,7 @@ class Render {
             return nil
         }
     }
-
+    
     
     func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
