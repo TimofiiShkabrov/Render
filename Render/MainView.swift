@@ -45,7 +45,7 @@ struct MainView: View {
                         .foregroundStyle(.white)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: UIScreen.main.bounds.width * 0.95)
                         .background(Color.blue)
                         .cornerRadius(8)
                     }
@@ -59,7 +59,6 @@ struct MainView: View {
                         VStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .foregroundStyle(.green)
-                                .symbolEffect(.wiggle.backward.byLayer)
                                 .imageScale(.large)
                             Text("Сохронено!")
                                 .foregroundStyle(.black)
@@ -73,7 +72,6 @@ struct MainView: View {
                             VStack {
                                 Image(systemName: "pencil.line")
                                     .foregroundStyle(.blue)
-                                    .symbolEffect(.wiggle.backward.byLayer)
                                     .imageScale(.large)
                                 Text("Введите Emoji или текст к поле выше\n и нажмите кнопку Рендер")
                                     .multilineTextAlignment(.center)
@@ -89,8 +87,7 @@ struct MainView: View {
                     .aspectRatio(contentMode: .fit)
                     .opacity(0.9)
                     .cornerRadius(16))
-                .padding(.bottom, 16)
-                
+
                 HStack {
                     if let fileURL = render.createPNGFile() {
                         ShareLink(item: fileURL, preview: SharePreview("Rendered Image", image: Image(uiImage: render.image!))) {
@@ -98,7 +95,6 @@ struct MainView: View {
                                 Text("Поделиться")
                                 Image(systemName: "square.and.arrow.up.fill")
                                     .imageScale(.large)
-                                    .symbolEffect(.breathe.plain.byLayer)
                             }
                         }
                     } else {
@@ -106,7 +102,6 @@ struct MainView: View {
                             Text("Поделиться")
                             Image(systemName: "square.and.arrow.up.fill")
                                 .imageScale(.large)
-                                .symbolEffect(.breathe.plain.byLayer)
                         }
                         .foregroundStyle(colorScheme == .dark ? Color(#colorLiteral(red: 0.2745094299, green: 0.274510026, blue: 0.2873998582, alpha: 1)) : Color(#colorLiteral(red: 0.7725487947, green: 0.772549212, blue: 0.7811570764, alpha: 1)))
                     }
@@ -120,7 +115,6 @@ struct MainView: View {
                             Text("Сохранить")
                             Image(systemName: "square.and.arrow.down.fill")
                                 .imageScale(.large)
-                                .symbolEffect(.breathe.plain.byLayer)
                         }
                     }
                 }
